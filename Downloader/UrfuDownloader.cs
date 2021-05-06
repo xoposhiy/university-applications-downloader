@@ -8,20 +8,38 @@ namespace Downloader
 {
     class UrfuDownloader
     {
-        public Dictionary<int, HtmlDocument> cache = new Dictionary<int, HtmlDocument>();
+        public Dictionary<string, HtmlDocument> cache = new Dictionary<string, HtmlDocument>();
 
         public Application[] DownloadApplications(int department, string programName)
         {
-            var htmlDoc = cache.TryGetValue(department, out var doc) ? doc : GetApplicationListsDocument(department, 1);
-            cache[department] = htmlDoc;
+            return DownloadApplications(department, programName, 18).Where(s => s.Name.EndsWith(")") && IsFirstWave(s)).Concat(
+                DownloadApplications(department, programName, 20).Where(s => s.Name.EndsWith(")") && !IsFirstWave(s)).Concat(
+                    DownloadApplications(department, programName, 22)))
+                .OrderByDescending(a => a.TotalScore)
+                .ToArray();
+        }
+
+        private bool IsFirstWave(Application application)
+        {
+            return application.AdmissionType == AdmissionType.Preferences
+                   || application.AdmissionType == AdmissionType.Targeted
+                   || application.AdmissionType == AdmissionType.WithoutExams;
+        }
+
+        private IEnumerable<Application> DownloadApplications(int department, string programName, int presetId)
+        {
+            var htmlDoc = cache.TryGetValue(department + "-" + presetId, out var doc)
+                ? doc
+                : GetApplicationListsDocument(presetId, department, 1);
+            cache[department + "-" + presetId] = htmlDoc;
             var students = ExtractApplications(htmlDoc, programName, "по общему конкурсу", AdmissionType.Rating);
             var studentsK = ExtractApplications(htmlDoc, programName, "по договорам об оказании платных образовательных услуг",
                 AdmissionType.Contract);
             var studentsL = ExtractApplications(htmlDoc, programName, "в пределах квоты приема лиц, имеющих особое право",
                 AdmissionType.Preferences);
-            var studentsG = ExtractApplications(htmlDoc, programName, "в пределах квоты целевого приема", AdmissionType.Targeted);
-            var allStudents = students.Concat(studentsK).Concat(studentsL).Concat(studentsG).ToArray();
-            return allStudents;
+            var studentsG =
+                ExtractApplications(htmlDoc, programName, "в пределах квоты целевого приема", AdmissionType.Targeted);
+            return students.Concat(studentsK).Concat(studentsL).Concat(studentsG);
         }
 
         private static Application[] ExtractApplications(HtmlDocument doc, string programSubstring, string konkursSubstring, AdmissionType admissionType)
@@ -38,10 +56,11 @@ namespace Downloader
             return new Application[0];
         }
 
-        private static HtmlDocument GetApplicationListsDocument(int department, int ftype)
+        //TODO: 18 тоже меняется после нулевой волны. Стал 20. Видимо после 1 волны ещё раз поменяется на 21. А после - на 23
+        private static HtmlDocument GetApplicationListsDocument(int presetId, int department, int ftype)
         {
             var baseUrl = "https://urfu.ru/";
-            var departmentJsonUrl = $"{baseUrl}api/ratings/departmental/18/{department}/{ftype}";
+            var departmentJsonUrl = $"{baseUrl}api/ratings/departmental/{presetId}/{department}/{ftype}";
             var res = departmentJsonUrl.GetJson<UrfuDepartmentResponse>();
             var htmlWeb = new HtmlWeb
             {
@@ -49,7 +68,7 @@ namespace Downloader
                 OverrideEncoding = Encoding.UTF8
             };
             var doc = htmlWeb.Load($"{baseUrl}{res.url}");
-            Console.WriteLine($"Retrieved department {department}");
+            Console.WriteLine($"Retrieved department {department}  preset {presetId}");
             return doc;
         }
 
