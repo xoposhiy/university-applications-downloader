@@ -36,7 +36,7 @@ namespace okf_urfu_downloader
                 ? new RatingClient(args[0])
                 : new RatingClient(args[0], args[1]);
 
-            var sleep = TimeSpan.FromMinutes(1);
+            var sleep = TimeSpan.FromMinutes(15);
             var nextTime = DateTime.Now;
             while (true)
             {
