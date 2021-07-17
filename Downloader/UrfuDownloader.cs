@@ -12,9 +12,9 @@ namespace Downloader
 
         public Application[] DownloadApplications(int department, string programName)
         {
-            return DownloadApplications(department, programName, 18).Where(s => s.Name.EndsWith(")") && IsFirstWave(s)).Concat(
-                DownloadApplications(department, programName, 20).Where(s => s.Name.EndsWith(")") && !IsFirstWave(s)).Concat(
-                    DownloadApplications(department, programName, 22)))
+            return DownloadApplications(department, programName, 1).Where(s => s.Name.EndsWith(")") && IsFirstWave(s)).Concat(
+                DownloadApplications(department, programName, 1).Where(s => s.Name.EndsWith(")") && !IsFirstWave(s)).Concat(
+                    DownloadApplications(department, programName, 1)))
                 .OrderByDescending(a => a.TotalScore)
                 .ToArray();
         }
@@ -76,22 +76,24 @@ namespace Downloader
         {
             try
             {
-                var contract = values.Length == 7;
+                var contract = false;//values.Length == 7;
                 var i = 0;
                 var name = values[i++];
                 i++; // regNumber
                 var withAgreement = !contract && values[i++].Contains("Да");
+                var withOriginals = !contract && values[i++].Contains("Да");
                 if (values[i].Contains("Без вступительных испытаний"))
                 {
-                    return Application.Bvi(name, withAgreement);
+                    return Application.Bvi(name, withAgreement, withOriginals);
                 }
 
                 var math = Mark.Parse(values[i++]);
                 var inf = Mark.Parse(values[i++]);
+                var phys = Mark.Parse(values[i++]);
                 var rus = Mark.Parse(values[i++]);
                 var additionalScore = int.TryParse(values[i++], out var v) ? v : 0;
                 var totalScore = int.Parse(values[i++]);
-                return new Application(name, withAgreement, admissionType, math, inf, rus, additionalScore, totalScore);
+                return new Application(name, withAgreement, withOriginals, admissionType, math, inf, phys, rus, additionalScore, totalScore);
             }
             catch (Exception e)
             {

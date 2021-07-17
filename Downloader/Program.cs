@@ -15,7 +15,7 @@ namespace Downloader
 {
     internal static class Program
     {
-        private static readonly string spreadSheetId = "1bh9ZAxtb9nghU7GNXNFfhyLZUA4b3wky7WZoxBD-OpE";
+        private static readonly string spreadSheetId = "12HdT-UBx0fw__lcwSxt98W3AfkcGRxEoO2lp0lXYSPs";
 
         private static void Main(string[] args)
         {
@@ -43,10 +43,8 @@ namespace Downloader
                     Console.WriteLine("Где\tколво\tсогласие\tБВИ\tконтракт");
                     DownloadUrfu(urfuDownloader, "ФИИТ", 4,
                         "ИЕНиМ, 02.03.02 Фундаментальная информатика и информационные технологии (Разработка программных продуктов)");
-                    DownloadUrfu(urfuDownloader, "КН", 4,
-                        "ИЕНиМ, 02.03.01 Математика и компьютерные науки (Математика и компьютерные науки)");
-                    DownloadUrfu(urfuDownloader, "МОАИС", 4,
-                        "ИЕНиМ, 02.03.03 Математическое обеспечение и администрирование информационных систем (Математическое обеспечение и администрирование информационных систем)");
+                    DownloadUrfu(urfuDownloader, "КН МОАИС", 4,
+                        "ИЕНиМ, 02.00.00 Компьютерные и информационные науки (Компьютерные и информационные науки (02.03.01, 02.03.03))");
                     DownloadUrfu(urfuDownloader, "КБ", 4, "ИЕНиМ, 10.05.01 Компьютерная безопасность");
                     DownloadUrfu(urfuDownloader, "ПрИнф", 7,
                         "ИРИТ-РТФ, 09.03.03 Прикладная информатика (Прикладная информатика)");
@@ -128,7 +126,7 @@ namespace Downloader
 
         private static SheetsService CreateService()
         {
-            var credential = GoogleCredential.FromFile("GoogleSheets-secrets.json")
+            var credential = GoogleCredential.FromFile("googleapi-credentials.json")
                 .CreateScoped(SheetsService.Scope.Spreadsheets);
             return new SheetsService(new BaseClientService.Initializer
             {

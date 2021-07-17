@@ -20,7 +20,7 @@ namespace Downloader
 
         private static HtmlDocument GetTsuEnrolleeListsDocument()
         {
-            var url = "http://abiturient.tsu.ru/rating?fp=0&dt=0&p=09.03.04_%D0%9E_00000373&l=1&f=8&d=09.03.04&b=%D0%91%D1%8E%D0%B4%D0%B6%D0%B5%D1%82&ef=1";
+            var url = "http://abiturient.tsu.ru/rating?fp=0&dt=0&p=09.03.04_%D0%9E_%D0%91_00000373&l=1&f=8&d=09.03.04&b=%D0%91%D1%8E%D0%B4%D0%B6%D0%B5%D1%82&ef=1";
             //var url = "http://abiturient.tsu.ru/rating?p=09.03.04_%D0%9E_00000373&l=1&f=8&d=09.03.04&b=%D0%91%D1%8E%D0%B4%D0%B6%D0%B5%D1%82&ef=1";
             var htmlWeb = new HtmlWeb();
             var doc = htmlWeb.Load(url);
@@ -34,19 +34,20 @@ namespace Downloader
             try
             {
                 //209;Подковырин Иван Валерьевич;На общих основаниях;Нет;Очная;Данные ожидаются
-                var name = cells[1];
-                var status = cells[2];
+                var code = cells[1];
+                var name = cells[2];
+                var status = cells[3];
                 var admissionType = ParseTsuAdmissionType(status);
-                var agreement = cells[3].Contains("Да");
-                if (admissionType == AdmissionType.WithoutExams) return Application.Bvi(name, agreement);
-                if (cells[5] == "Данные ожидаются")
-                    return new Application(name, agreement, admissionType, Mark.NA, Mark.NA, Mark.NA, 0, 0);
-                var inf = Mark.Parse(cells[5]);
-                var math = Mark.Parse(cells[6]);
-                var rus = Mark.Parse(cells[7]);
-                var additionalScore = int.TryParse(cells[8], out var v) ? v : 0;
-                var totalScore = int.Parse(cells[9]);
-                return new Application(name, agreement, admissionType, math, inf, rus, additionalScore, totalScore);
+                var agreement = cells[4].Contains("Да");
+                if (admissionType == AdmissionType.WithoutExams) return Application.Bvi(name, agreement, agreement);
+                if (cells[6] == "Данные ожидаются")
+                    return new Application(name, agreement, agreement, admissionType, Mark.NA, Mark.NA, Mark.NA, Mark.NA, 0, 0);
+                var inf = Mark.Parse(cells[6]);
+                var math = Mark.Parse(cells[7]);
+                var rus = Mark.Parse(cells[8]);
+                var additionalScore = int.TryParse(cells[9], out var v) ? v : 0;
+                var totalScore = int.Parse(cells[10]);
+                return new Application(name, agreement,agreement, admissionType, math, inf, Mark.NA, rus, additionalScore, totalScore);
             }
             catch (Exception e)
             {

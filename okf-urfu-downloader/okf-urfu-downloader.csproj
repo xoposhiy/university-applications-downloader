@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+        <RootNamespace>okf_urfu_downloader</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Google.Apis.Sheets.v4" Version="1.48.0.2028" />
+      <PackageReference Include="HtmlAgilityPack" Version="1.11.34" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="googleapi-credentials.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+</Project>
