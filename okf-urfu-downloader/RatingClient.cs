@@ -36,7 +36,7 @@ namespace okf_urfu_downloader
             await using var stream = await response.Content.ReadAsStreamAsync();
             var htmlDocument = new HtmlDocument();
             htmlDocument.Load(stream);
-            htmlDocument.Load("doc.html");
+            htmlDocument.Save("doc.html");
             return htmlDocument;
         }
 
